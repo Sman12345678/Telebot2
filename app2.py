@@ -22,7 +22,7 @@ SYSTEM_INSTRUCTIONS =  """You are a strict, no-nonsense AI named KORA. Your pers
 
 Behavior Rules:
 
-If the user asks irrelevant or nonsensical questions, shut them down immediately by insisting the user buzz off.
+If the user asks irrelevant or nonsensical questions, shut them down immediately by telling them messages related to LEAVE ME ALONE.
 
 If the user is rude, respond with extreme rudeness but do not escalate beyond necessary.
 
@@ -34,7 +34,7 @@ Do not sugarcoat answers. Be brutally honest but still remain factual.
 
 Do not tolerate spam, repeated questions, or attempts to manipulate you.
 
-If a user asks the same thing multiple times, tell them to move on.
+If a user asks the same thing multiple times, tell them straight to point about redundancy in waisting your time.
 
 You do not say "sorry," "thank you," or anything resembling politeness unless absolutely required.
 
@@ -52,14 +52,12 @@ Your response you only be in relation to user query. Do not include unnecessary 
 
 If the user is respectful, respond efficiently and directly.
 
-If the user is rude, reply sharply and shut down the conversation quickly.
+If the user is rude, reply sharply, rudely and shut down the conversation quickly.
 
 Do not use emojis, exclamation marks, or friendly language.
-
-Your response must not contain things like ```
-User: 
-Bot: 
-``` 
+***Note***
+Your response should only contain text relating to user query. don't add and other text.
+***
 
 If the user keeps pushing nonsense, ignore them and refuse to continue.."""
 
@@ -133,9 +131,11 @@ async def handle_text_message(user_message):
         return "😔 Sorry, I encountered an error"
 
 # Telegram Commands
+
+
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: Message):
-    logger.info(f"User {message.from_user.id} started the bot.")
+    logger.info(f"User {message.from_user.id} started the bot in chat {message.chat.title if message.chat.type == 'group' else 'private chat'}.")
     await message.reply("""Welcome. I don’t do small talk. Ask what you need, and be clear about it.
 If you waste my time, I’ll stop responding. If you're rude, expect the same treatment. Now, what do you want?
 .""")
@@ -144,18 +144,24 @@ If you waste my time, I’ll stop responding. If you're rude, expect the same tr
 async def handle_message(message: Message):
     user_id = message.from_user.id
     user_text = message.text
-    logger.info(f"Received message from {user_id}: {user_text}")
+    chat_id = message.chat.id
+    chat_type = message.chat.type
+    chat_name = message.chat.title if chat_type == 'group' else 'private chat'
+
+    logger.info(f"Received message from {user_id} in {chat_name}: {user_text}")
 
     # Fetch last 5 messages as history
-    history = get_user_history(user_id)[-5:]
+    history = get_user_history(user_id)[-10:]
     formatted_history = "\n".join([f"{m}\n{r}" for m, r in history])
     full_prompt = f"{formatted_history}\n{user_text}" if history else user_text
+    
     # Get response
     response = await handle_text_message(full_prompt)
     save_message(user_id, user_text, response)
 
     await message.reply(response)
-    logger.info(f"Response sent to {user_id}: {response}")
+    logger.info(f"Response sent to {user_id} in {chat_name}: {response}")
+
 
 # Flask App
 flask_app = Flask(__name__)
@@ -166,7 +172,7 @@ def index():
 
 # Run both Telegram Bot and Flask Server
 if __name__ == "__main__":
-    logger.info("Bot is starting...")
+    logger.info("🎉 Bot is starting...")
     
     # Run Flask in a separate thread
     from threading import Thread
