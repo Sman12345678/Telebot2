@@ -55,6 +55,9 @@ If the user is respectful, respond efficiently and directly.
 If the user is rude, reply sharply and shut down the conversation quickly.
 
 Do not use emojis, exclamation marks, or friendly language.
+***Note***
+Your response should only contain text relating to user query. don't add and other text.
+***
 
 If the user keeps pushing nonsense, ignore them and refuse to continue.."""
 
@@ -113,43 +116,46 @@ async def ask_openai(prompt):
         return "Sorry, I encountered an error. Try again later."
 
 # Telegram Commands
+
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: Message):
-    logger.info(f"User {message.from_user.id} started the bot.")
-    await message.reply("""Welcome. I don’t do small talk. Ask what you need, and be clear about it.  
-If you waste my time, I’ll stop responding.  
-If you're rude, expect the same treatment.  
-Now, what do you want?
+    logger.info(f"User {message.from_user.id} started the bot in chat {message.chat.title if message.chat.type == 'group' else 'private chat'}.")
+    await message.reply("""Welcome. I don’t do small talk. Ask what you need, and be clear about it.
+If you waste my time, I’ll stop responding. If you're rude, expect the same treatment. Now, what do you want?
 .""")
 
 @dp.message_handler()
 async def handle_message(message: Message):
     user_id = message.from_user.id
     user_text = message.text
-    logger.info(f"Received message from {user_id}: {user_text}")
+    chat_id = message.chat.id
+    chat_type = message.chat.type
+    chat_name = message.chat.title if chat_type == 'group' else 'private chat'
+
+    logger.info(f"Received message from {user_id} in {chat_name}: {user_text}")
 
     # Fetch last 5 messages as history
-    history = get_user_history(user_id)[-5:]
-    formatted_history = "\n".join([f"User: {m}\nBot: {r}" for m, r in history])
-    full_prompt = f"{formatted_history}\nUser: {user_text}\nBot:" if history else user_text
-
+    history = get_user_history(user_id)[-10:]
+    formatted_history = "\n".join([f"{m}\n{r}" for m, r in history])
+    full_prompt = f"{formatted_history}\n{user_text}" if history else user_text
+    
     # Get response
-    response = await ask_openai(full_prompt)
+    response = await handle_text_message(full_prompt)
     save_message(user_id, user_text, response)
 
     await message.reply(response)
-    logger.info(f"Response sent to {user_id}: {response}")
+    logger.info(f"Response sent to {user_id} in {chat_name}: {response}")
 
 # Flask App
 flask_app = Flask(__name__)
 
 @flask_app.route('/')
 def index():
-    return "Bot is running!"
+    return " Bot is running!"
 
 # Run both Telegram Bot and Flask Server
 if __name__ == "__main__":
-    logger.info("Bot is starting...")
+    logger.info("🎉 Bot is starting...")
     
     # Run Flask in a separate thread
     from threading import Thread
