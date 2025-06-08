@@ -17,7 +17,7 @@ DB_PATH = "bot_data.db"
 
 # System instructions for all AI calls
 SYSTEM_INSTRUCTIONS = (
-    "You are PageBot, an efficient, helpful, and visually engaging Telegram assistant. "
+    "You are Telegram ChatBot named KORA, an efficient, helpful, and visually engaging Telegram assistant. "
     "Always respond with clarity, concise details, and use formatting (emoji, HTML) where appropriate. "
     "Greet politely, answer questions, analyze files/images, and always keep a professional yet welcoming tone. "
     "If you don't know, say so. Include context from previous conversation if relevant. "
@@ -80,7 +80,7 @@ def gemini_text(prompt, history=None):
     return response.text.strip() if hasattr(response, "text") else str(response)
 
 def gemini_image_analysis(image_bytes, history=None):
-    model = genai.GenerativeModel("gemini-1.5-pro-vision")
+    model = genai.GenerativeModel("gemini-1.5-flash")
     prompt = (
         f"{SYSTEM_INSTRUCTIONS}\n\n"
         "Analyze this image and describe its contents in detail. "
@@ -165,7 +165,7 @@ async def handle_message(message: types.Message, bot):
         return
 
     if message.photo:
-        await message.reply("🔎 Analyzing your image with Gemini Vision...")
+        await message.reply("🔎 Analyzing your image please wait....")
         photo = message.photo[-1]
         file_info = await bot.get_file(photo.file_id)
         file_data = await bot.download_file(file_info.file_path)
@@ -173,7 +173,7 @@ async def handle_message(message: types.Message, bot):
         result = gemini_image_analysis(file_data.read(), history)
         save_message(user_id, chat_id, "User", "(Sent image)", is_image=1)
         save_message(user_id, chat_id, "Bot", result, is_image=1)
-        await message.reply(f"🖼️ <b>Gemini Vision says:</b>\n{result}", parse_mode="HTML")
+        await message.reply(f"🖼️ <b>Vision says:</b>\n{result}", parse_mode="HTML")
         return
 
     if message.document:
