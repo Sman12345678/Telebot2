@@ -132,7 +132,7 @@ async def handle_file(message: types.Message, bot):
     await message.reply(f"<b>📄 File content for <code>{document.file_name}</code>:</b>\n<pre>{content}</pre>", parse_mode="HTML")
 
 async def send_music(message: types.Message, bot):
-    path = "media/music.mp3"
+    path = "https://raw.githubusercontent.com/Sman12345678/Page-Bot/main/audio/Khalid-Young-Dumb-Broke-via-Naijafinix.com_.mp3"
     if os.path.exists(path):
         await bot.send_audio(message.chat.id, audio=open(path, 'rb'), title="Sample Music")
     else:
