@@ -1,3 +1,8 @@
+Info = {
+    "Usage": "/install filename.py\\n<code>",
+    "Description": "Admin-only: Install or update a command file."
+}
+
 import os
 from config import ADMIN_IDS
 
