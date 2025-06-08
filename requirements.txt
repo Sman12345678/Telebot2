@@ -8,3 +8,5 @@ filelock
 google-generativeai
 beautifulsoup4
 qrcode
+pillow
+requests 
