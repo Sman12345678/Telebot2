@@ -7,3 +7,4 @@ flask
 filelock
 google-generativeai
 beautifulsoup4
+qrcode
