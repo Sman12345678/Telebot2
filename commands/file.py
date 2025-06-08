@@ -1,3 +1,8 @@
+Info = {
+    "Usage": "/file <filename>",
+    "Description": "Admin-only: View the code of any file in your project."
+}
+
 import os
 from config import ADMIN_IDS
 
