@@ -1,3 +1,8 @@
+Info = {
+    "Usage": "/imagine <prompt>",
+    "Description": "Generate image and text using Kaizenji API."
+}
+
 import requests
 from io import BytesIO
 
