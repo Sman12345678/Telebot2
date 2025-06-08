@@ -13,7 +13,7 @@ async def execute(message, bot, sender_id=None):
     api_url = "https://kaiz-apis.gleeze.com/api/gpt-4o-pro"
     params = {
         "ask": prompt,
-        "uid": "Kora",
+        "uid": "sman",
         "imageUrl": "",
         "apikey": "2d91ea21-2c65-4edc-b601-8d06085c8358"
     }
