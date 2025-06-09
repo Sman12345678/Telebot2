@@ -1,5 +1,5 @@
 Info = {
-    "Usage": "/install filename.py\\n<code>",
+    "Usage": "/install filename.py\\n[code]",
     "Description": "Admin-only: Install or update a command file."
 }
 
