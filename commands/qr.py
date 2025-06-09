@@ -26,4 +26,4 @@ async def execute(message, bot, sender_id=None):
 def register(dp):
     @dp.message_handler(commands=["qr"])
     async def _cmd(message):
-        await execute(message, message.bot, sender_id=message.from_user.id)
+         await message.reply(await execute(message, message.bot, sender_id=message.from_user.id), parse_mode="HTML")
