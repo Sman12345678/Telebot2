@@ -1,5 +1,5 @@
 import os
-import io
+from io import BytesIO
 import importlib
 import sqlite3
 from aiogram import types
