@@ -1,5 +1,5 @@
 Info = {
-    "Usage": "/qr <text or link>",
+    "Usage": "/qr [Text or link]",
     "Description": "Generate a QR code for any link or text."
 }
 
