@@ -11,7 +11,8 @@ async def execute(message, bot, sender_id=None):
     if not prompt:
         await bot.send_message(message.chat.id, "Please provide a prompt e.g /gen cat")
 
-    await bot.send_message(message.chat.id, "🎨 Generating your image...")
+    else:
+        await bot.send_message(message.chat.id, "🎨 Generating your image...")
 
     api_url = f"https://kaiz-apis.gleeze.com/api/stable-diffusion-3.5-rev2?prompt={prompt}&apikey=2d91ea21-2c65-4edc-b601-8d06085c8358"
     try:
