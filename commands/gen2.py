@@ -1,5 +1,5 @@
 Info = {
-    "Usage": "/gen2 <prompt>",
+    "Usage": "/gen2 [prompt]",
     "Description": "Generate an image (Flux model)."
 }
 
