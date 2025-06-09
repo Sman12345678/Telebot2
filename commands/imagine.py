@@ -1,5 +1,5 @@
 Info = {
-    "Usage": "/imagine <prompt>",
+    "Usage": "/imagine [prompt]",
     "Description": "Generate image and text using Kaizenji API."
 }
 
