@@ -9,7 +9,7 @@ from io import BytesIO
 async def execute(message, bot, sender_id=None):
     text = message.text.partition(" ")[2].strip()
     if not text:
-        return "❗ Usage: <code>/qr &lt;link or text&gt;</code>"
+        return "❗ Usage: <code>/qr <link or text></code>"
     try:
         qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M)
         qr.add_data(text)
