@@ -3,73 +3,74 @@ Info = {
     "Description": "Manage bot admins: add, remove, or list admin user IDs."
 }
 
-import json
-import os
-from config import ADMIN_IDS  # Main admins from config
-
-ADMINS_FILE = "admins.json"
-
-def load_admins():
-    if not os.path.exists(ADMINS_FILE):
-        return ADMIN_IDS[:]  # Start with config admins if no file
-    with open(ADMINS_FILE, "r") as f:
-        return json.load(f)
-
-def save_admins(admins):
-    with open(ADMINS_FILE, "w") as f:
-        json.dump(admins, f)
+from config import ADMIN_IDS  # Example: ADMIN_IDS = [123456]
+extra_admins = []  # Temporary session-only admins
 
 def is_admin(user_id):
-    admins = load_admins()
-    return user_id in admins
+    return user_id in ADMIN_IDS or user_id in extra_admins
 
 async def execute(message, bot, sender_id=None, args=None):
     if not is_admin(sender_id):
-        return "[⛔] You do not have permission to manage admins."
-    
-    args = (args or "").split()
+        await bot.send_message(message.chat.id, "[⛔] You do not have permission to manage admins.")
+        return
+
+    if args is None:
+        args = message.text.partition(" ")[2].strip()
+    args = args.split()
+
     if not args:
-        return (
+        await bot.send_message(message.chat.id,
             "Usage:\n"
             "/admin add [user_id]\n"
             "/admin del [user_id]\n"
             "/admin list"
         )
-    
+        return
+
     action = args[0].lower()
-    admins = load_admins()
-    
+
     if action == "add" and len(args) == 2:
         try:
             new_admin = int(args[1])
         except ValueError:
-            return "[!] User ID must be a number."
-        if new_admin in admins:
-            return f"[!] User ID [{new_admin}] is already an admin."
-        admins.append(new_admin)
-        save_admins(admins)
-        return f"[✅] User ID [{new_admin}] added as admin."
-    
+            await bot.send_message(message.chat.id, "[!] User ID must be a number.")
+            return
+        if new_admin in ADMIN_IDS or new_admin in extra_admins:
+            await bot.send_message(message.chat.id, f"[!] User ID [{new_admin}] is already an admin.")
+            return
+        extra_admins.append(new_admin)
+        await bot.send_message(message.chat.id, f"[✅] User ID [{new_admin}] added as admin.")
+
     elif action == "del" and len(args) == 2:
         try:
             del_admin = int(args[1])
         except ValueError:
-            return "[!] User ID must be a number."
-        if del_admin not in admins:
-            return f"[!] User ID [{del_admin}] is not an admin."
+            await bot.send_message(message.chat.id, "[!] User ID must be a number.")
+            return
         if del_admin in ADMIN_IDS:
-            return "[⛔] Cannot remove a main admin defined in config."
-        admins.remove(del_admin)
-        save_admins(admins)
-        return f"[✅] User ID [{del_admin}] removed from admins."
-    
+            await bot.send_message(message.chat.id, "[⛔] Cannot remove a main admin defined in config.")
+            return
+        if del_admin not in extra_admins:
+            await bot.send_message(message.chat.id, f"[!] User ID [{del_admin}] is not an extra admin.")
+            return
+        extra_admins.remove(del_admin)
+        await bot.send_message(message.chat.id, f"[✅] User ID [{del_admin}] removed from admins.")
+
     elif action == "list":
-        return "[Current admins:]\n" + "\n".join(f"[{a}]" for a in admins)
-    
+        full_admins = ADMIN_IDS + extra_admins
+        await bot.send_message(
+            message.chat.id,
+            "[Current admins:]\n" + "\n".join(f"[{a}]" for a in full_admins)
+        )
     else:
-        return (
+        await bot.send_message(message.chat.id,
             "[Invalid usage.]\n"
             "/admin add [user_id]\n"
             "/admin del [user_id]\n"
             "/admin list"
         )
+
+def register(dp):
+    @dp.message_handler(commands=["admin"])
+    async def _cmd(message):
+        await execute(message, message.bot, sender_id=message.from_user.id)
