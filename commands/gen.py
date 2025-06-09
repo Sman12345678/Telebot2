@@ -9,7 +9,7 @@ from io import BytesIO
 async def execute(message, bot, sender_id=None):
     prompt = message.text.partition(" ")[2].strip()
     if not prompt:
-        return "❌ Please provide a prompt for image generation. Usage: <code>/gen your prompt</code>"
+        await bot.send_message(message.chat.id, "Please provide a prompt e.g /gen cat")
 
     await bot.send_message(message.chat.id, "🎨 Generating your image...")
 
