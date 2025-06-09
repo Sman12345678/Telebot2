@@ -104,7 +104,7 @@ def read_file(file_bytes, filename):
     ext = os.path.splitext(filename)[-1].lower()
     if ext == ".pdf":
         try:
-            reader = PdfReader(io.BytesIO(file_bytes))
+            reader = PdfReader(BytesIO(file_bytes))
             text = ""
             for page in reader.pages:
                 text += page.extract_text() or ""
