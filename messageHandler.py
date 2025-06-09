@@ -134,25 +134,31 @@ async def handle_file(message: types.Message, bot):
     await message.reply(f"<b>📄 File content for <code>{document.file_name}</code>:</b>\n<pre>{content}</pre>", parse_mode="HTML")
 
 async def send_music(message: types.Message, bot):
-    path = "https://raw.githubusercontent.com/Sman12345678/Page-Bot/main/audio/Khalid-Young-Dumb-Broke-via-Naijafinix.com_.mp3"
-    if os.path.exists(path):
-        await bot.send_audio(message.chat.id, audio=open(path, 'rb'), title="Sample Music")
-    else:
-        await message.reply("🎶 Sample music file not found.")
+    url = "https://raw.githubusercontent.com/Sman12345678/Page-Bot/main/audio/Khalid-Young-Dumb-Broke-via-Naijafinix.com_.mp3"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        await bot.send_audio(message.chat.id, audio=BytesIO(response.content), title="Sample Music")
+    except Exception as e:
+        await message.reply(f"🎶 Sample music file not found. {e}")
 
 async def send_image(message: types.Message, bot):
-    path = "https://i.ibb.co/3XHHnPy/image.jpg"
-    if os.path.exists(path):
-        await bot.send_photo(message.chat.id, photo=open(path, 'rb'), caption="Here's a cool image!")
-    else:
-        await message.reply("📷 Image file not found.")
+    url = "https://i.ibb.co/3XHHnPy/image.jpg"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        await bot.send_photo(message.chat.id, photo=BytesIO(response.content), caption="Here's a cool image!")
+    except Exception as e:
+        await message.reply(f"📷 Image file not found. {e}")
 
 async def send_video(message: types.Message, bot):
-    path = "https://i.ibb.co/p685Xh9W/image.gif"
-    if os.path.exists(path):
-        await bot.send_video(message.chat.id, video=open(path, 'rb'), caption="Enjoy this video!")
-    else:
-        await message.reply("🎬 Video file not found.")
+    url = "https://i.ibb.co/p685Xh9W/image.gif"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        await bot.send_video(message.chat.id, video=BytesIO(response.content), caption="Enjoy this video!")
+    except Exception as e:
+        await message.reply(f"🎬 Video file not found. {e}")
 
 async def handle_message(message: types.Message, bot):
     user_id = message.from_user.id
