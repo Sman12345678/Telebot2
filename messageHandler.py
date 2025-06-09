@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import google.generativeai as genai
 import time 
+import requests
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
