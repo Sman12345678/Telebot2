@@ -9,9 +9,10 @@ from io import BytesIO
 async def execute(message, bot, sender_id=None):
     prompt = message.text.partition(" ")[2].strip()
     if not prompt:
-        return "❌ Please provide a prompt for image generation. Usage: <code>/gen2 your prompt</code>"
+        await bot.send_message(message.chat.id,"❌ Please provide a prompt for image generation. Usage:/gen2 [your prompt]")
 
-    await bot.send_message(message.chat.id, "🎨 Generating your image...")
+    else:
+        await bot.send_message(message.chat.id, "🎨 Generating your image...")
 
     api_url = f"https://kaiz-apis.gleeze.com/api/flux?prompt={prompt}&apikey=2d91ea21-2c65-4edc-b601-8d06085c8358"
     try:
