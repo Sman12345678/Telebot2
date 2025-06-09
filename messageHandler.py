@@ -8,12 +8,14 @@ from PyPDF2 import PdfReader
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import google.generativeai as genai
+import time 
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 DB_PATH = "bot_data.db"
+time_now=time.asctime(time.localtime(time.time())))
 
 # System instructions for all AI calls
 SYSTEM_INSTRUCTIONS = (
@@ -218,4 +220,4 @@ async def handle_message(message: types.Message, bot):
     ai_reply = gemini_text(message.text, history)
     save_message(user_id, chat_id, "User", message.text)
     save_message(user_id, chat_id, "Bot", ai_reply)
-    await message.reply(f"<b>{ai_reply}</b>")
+    await message.reply(ai_reply)
