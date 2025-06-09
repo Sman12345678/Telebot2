@@ -15,7 +15,6 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 DB_PATH = "bot_data.db"
-time_now=time.asctime(time.localtime(time.time())))
 
 # System instructions for all AI calls
 SYSTEM_INSTRUCTIONS = (
@@ -90,7 +89,7 @@ def gemini_image_analysis(image_bytes, history=None):
     prompt = (
         f"{SYSTEM_INSTRUCTIONS}\n\n"
         "Analyze this image and describe its contents in detail. "
-        "If there's visible text, translate and identify the language. "
+        "If there's visible text, list all visible text, translate and identify the language. "
         "If it's a question, provide the answer."
     )
     if history:
