@@ -1,5 +1,5 @@
 Info = {
-    "Usage": "/file <filename>",
+    "Usage": "/file [filename]",
     "Description": "Admin-only: View the code of any file in your project."
 }
 
