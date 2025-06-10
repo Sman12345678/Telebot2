@@ -8,6 +8,19 @@ from dotenv import load_dotenv
 from flask import Flask,render_template
 from threading import Thread
 import sqlite3
+import pkgutil
+import importlib
+import commands
+
+# Register all command callback handlers automatically
+for loader, name, is_pkg in pkgutil.iter_modules(commands.__path__):
+    module = importlib.import_module(f'commands.{name}')
+    if hasattr(module, "oncallback"):
+        # Each command must prefix its callback_data with its module name (e.g. rps_, another_command_)
+        dp.register_callback_query_handler(
+            getattr(module, "oncallback"),
+            lambda c, n=name: c.data and c.data.startswith(f"{n}_")
+        )
 
 from messageHandler import handle_message, register_command_handlers
 
