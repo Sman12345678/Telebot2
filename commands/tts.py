@@ -8,11 +8,12 @@ import tempfile
 import os
 from io import BytesIO
 
-async def execute(message, bot, sender_id=None, args=None):
-    text = args or ""
-    if not text.strip():
-        return "[!] Please provide the text to convert to speech. Usage: /tts [your text here]"
-    
+async def execute(message, bot, sender_id=None):
+    text = message.text.partition(" ")[2].strip()
+    if not text:
+        await bot.send_message(message.chat.id, "[!] Usage: /tts [your text here]")
+        return
+
     # Generate speech and save to a temp file
     with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as tmp_file:
         filename = tmp_file.name
@@ -25,9 +26,8 @@ async def execute(message, bot, sender_id=None, args=None):
             audio_bytes = BytesIO(audio.read())
             audio_bytes.name = "speech.mp3"
             await bot.send_audio(message.chat.id, audio=audio_bytes, title="TTS")
-        return None  # Reply is the audio
     except Exception as e:
-        return f"[❌] Error generating speech: [{e}]"
+        await bot.send_message(message.chat.id, f"[❌] Error generating speech: [{e}]")
     finally:
         if os.path.exists(filename):
             os.remove(filename)
