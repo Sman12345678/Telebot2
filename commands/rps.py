@@ -38,8 +38,11 @@ async def execute(message: types.Message, bot, sender_id=None):
     )
     await message.reply(text, reply_markup=get_rps_keyboard())
 
-async def oncallback(callback_query: types.CallbackQuery, bot):
+# ----------- MODIFIED HANDLER ------------
+async def oncallback(callback_query: types.CallbackQuery):
+    bot = callback_query.bot
     if not callback_query.data.startswith("rps_"):
+        await callback_query.answer("Invalid move.", show_alert=True)
         return
 
     user_choice = callback_query.data.replace("rps_", "")
