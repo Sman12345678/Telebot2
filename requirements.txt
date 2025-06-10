@@ -10,4 +10,4 @@ beautifulsoup4
 qrcode
 pillow
 requests 
-pyttsx3
+gTTs
