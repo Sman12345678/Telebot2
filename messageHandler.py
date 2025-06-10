@@ -85,20 +85,27 @@ def gemini_text(prompt, history=None):
     response = model.generate_content(full_prompt)
     return response.text.strip() if hasattr(response, "text") else str(response)
 
-def gemini_image_analysis(image_bytes, history=None):
+def gemini_image_analysis(image_bytes, prompt=None, history=None):
     model = genai.GenerativeModel("gemini-1.5-flash")
-    prompt = (
-        f"{SYSTEM_INSTRUCTIONS}\n\n"
-        "Analyze this image and describe its contents in detail. "
-        "If there's visible text, list all visible text, translate and identify the language. "
-        "If it's a question, provide the answer."
-    )
-    if history:
-        full_prompt = f"{prompt}\n\nConversation so far:\n{history}"
+    if prompt:
+        final_prompt = (
+            f"{SYSTEM_INSTRUCTIONS}\n\n"
+            f"{prompt.strip()}"
+        )
     else:
-        full_prompt = prompt
+        final_prompt = (
+            f"{SYSTEM_INSTRUCTIONS}\n\n"
+            "Analyze this image and describe its contents in detail. "
+            "If there's visible text, list all visible text, translate and identify the language. "
+            "If it's a question, provide the answer."
+        )
+    if history:
+        full_prompt = f"{final_prompt}\n\nConversation so far:\n{history}"
+    else:
+        full_prompt = final_prompt
     response = model.generate_content([full_prompt, {"mime_type": "image/jpeg", "data": image_bytes}])
     return response.text.strip() if hasattr(response, "text") else str(response)
+
 
 def read_file(file_bytes, filename):
     ext = os.path.splitext(filename)[-1].lower()
@@ -170,7 +177,7 @@ async def handle_message(message: types.Message, bot):
             "<b>👋 Welcome I am <u>Kora Ai</u>!</b>\n"
             "I'm your multi-talented assistant. Use the menu below or type commands like <code>/imagine</code>, <code>/help</code>, etc.\n"
             "You can analyze images, files, and even get music or videos!\n"
-            "Choose an option below 👇"
+            "Choose an option below 👇 or type / for available commands."
         )
         save_message(user_id, chat_id, "Bot", "Sent main menu.")
         await message.reply(txt, reply_markup=main_menu_keyboard(), parse_mode="HTML")
@@ -182,8 +189,10 @@ async def handle_message(message: types.Message, bot):
         file_info = await bot.get_file(photo.file_id)
         file_data = await bot.download_file(file_info.file_path)
         history = get_recent_history(user_id)
-        result = gemini_image_analysis(file_data.read(), history)
-        save_message(user_id, chat_id, "User", "(Sent image)", is_image=1)
+        # Use the caption as prompt if present, else None
+        prompt = message.caption if message.caption else None
+        result = gemini_image_analysis(file_data.read(), prompt, history)
+        save_message(user_id, chat_id, "User", f"(Sent image: {prompt if prompt else ''})", is_image=1)
         save_message(user_id, chat_id, "Bot", result, is_image=1)
         await message.reply(f"🖼️ <b>Image Analysis:</b>\n{result}", parse_mode="HTML")
         return
