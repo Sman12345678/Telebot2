@@ -12,21 +12,7 @@ import pkgutil
 import importlib
 import commands
 
-bot = Bot(token=TELEGRAM_BOT_TOKEN, parse_mode=ParseMode.HTML)
-dp = Dispatcher(bot)
-dp.middleware.setup(LoggingMiddleware())
-
-
 # Register all command callback handlers automatically
-for loader, name, is_pkg in pkgutil.iter_modules(commands.__path__):
-    module = importlib.import_module(f'commands.{name}')
-    if hasattr(module, "oncallback"):
-        # Each command must prefix its callback_data with its module name (e.g. rps_, another_command_)
-        dp.register_callback_query_handler(
-            getattr(module, "oncallback"),
-            lambda c, n=name: c.data and c.data.startswith(f"{n}_")
-        )
-
 from messageHandler import handle_message, register_command_handlers
 
 # Load env vars
@@ -54,6 +40,10 @@ def init_db():
 init_db()
 
 
+bot = Bot(token=TELEGRAM_BOT_TOKEN, parse_mode=ParseMode.HTML)
+dp = Dispatcher(bot)
+dp.middleware.setup(LoggingMiddleware())
+
 register_command_handlers(dp)
 
 @dp.message_handler(content_types=types.ContentTypes.ANY)
@@ -64,6 +54,15 @@ flask_app = Flask(__name__)
 @flask_app.route('/')
 def index():
     return render_template("index.html")
+
+for loader, name, is_pkg in pkgutil.iter_modules(commands.__path__):
+    module = importlib.import_module(f'commands.{name}')
+    if hasattr(module, "oncallback"):
+        # Each command must prefix its callback_data with its module name (e.g. rps_, another_command_)
+        dp.register_callback_query_handler(
+            getattr(module, "oncallback"),
+            lambda c, n=name: c.data and c.data.startswith(f"{n}_")
+        )
 
 def run_flask():
     flask_app.run(host="0.0.0.0", port=8080, use_reloader=False)
