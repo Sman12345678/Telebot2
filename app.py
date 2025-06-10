@@ -12,6 +12,11 @@ import pkgutil
 import importlib
 import commands
 
+bot = Bot(token=TELEGRAM_BOT_TOKEN, parse_mode=ParseMode.HTML)
+dp = Dispatcher(bot)
+dp.middleware.setup(LoggingMiddleware())
+
+
 # Register all command callback handlers automatically
 for loader, name, is_pkg in pkgutil.iter_modules(commands.__path__):
     module = importlib.import_module(f'commands.{name}')
@@ -48,9 +53,6 @@ def init_db():
         conn.commit()
 init_db()
 
-bot = Bot(token=TELEGRAM_BOT_TOKEN, parse_mode=ParseMode.HTML)
-dp = Dispatcher(bot)
-dp.middleware.setup(LoggingMiddleware())
 
 register_command_handlers(dp)
 
